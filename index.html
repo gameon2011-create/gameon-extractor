@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Game On Group — Contact Extractor</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Nunito',sans-serif;background:#f7f8fa;color:#1a1a2e;min-height:100vh}
+.hdr{background:#fff;border-bottom:3px solid #e8122d;padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:64px;box-shadow:0 2px 10px rgba(0,0,0,.07);position:sticky;top:0;z-index:100}
+.logo-img{height:38px;object-fit:contain}
+.logo-txt{font-size:17px;font-weight:900;color:#1a1a2e;display:none}.logo-txt span{color:#e8122d}
+.hdr-r{text-align:right}
+.tool-name{font-size:14px;font-weight:800;color:#1a1a2e;line-height:1}
+.tool-sub{font-size:11px;color:#bbb;font-weight:600;margin-top:2px}
+.badge{background:#e8122d;color:#fff;font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;letter-spacing:.5px;margin-top:3px;display:inline-block}
+.hero{background:linear-gradient(135deg,#1a1a2e 0%,#2d1b4e 60%,#1a1a2e 100%);color:#fff;padding:20px;text-align:center}
+.hero h1{font-size:19px;font-weight:900;margin-bottom:4px}.hero h1 span{color:#e8122d}
+.hero p{font-size:12px;color:rgba(255,255,255,.6)}
+.stats{display:flex;justify-content:center;gap:18px;margin-top:12px}
+.st{text-align:center}.st-n{font-size:22px;font-weight:900;color:#e8122d;line-height:1}
+.st-l{font-size:10px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.sdiv{width:1px;background:rgba(255,255,255,.12)}
+.main{max-width:860px;margin:0 auto;padding:18px 14px 80px}
+.card{background:#fff;border-radius:14px;padding:18px 20px;margin-bottom:16px;border:1px solid #eee;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.slbl{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;color:#bbb;margin-bottom:10px}
+.row{display:flex;gap:8px}
+.inp{flex:1;border:1.5px solid #e5e7eb;border-radius:8px;padding:10px 14px;font-family:'Nunito',sans-serif;font-size:14px;outline:none;color:#1a1a2e;transition:border-color .15s}
+.inp:focus{border-color:#e8122d}
+.btn-r{background:#e8122d;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;cursor:pointer;white-space:nowrap}
+.btn-r:hover{background:#c40e25}
+.hint{font-size:12px;color:#bbb;margin-top:7px}.hint a{color:#e8122d}
+.stbtn{background:none;border:none;font-size:12px;color:#bbb;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;padding:0}
+.stbtn:hover{color:#e8122d}
+.tabs{display:flex;background:#fff;border-radius:12px;padding:4px;border:1px solid #eee;box-shadow:0 2px 8px rgba(0,0,0,.04);margin-bottom:16px;overflow-x:auto;gap:2px}
+.tbtn{flex:1;min-width:65px;padding:8px 6px;text-align:center;font-size:11px;font-weight:800;border-radius:9px;cursor:pointer;color:#aaa;border:none;background:none;font-family:'Nunito',sans-serif;white-space:nowrap;transition:all .2s}
+.tbtn.active{background:#e8122d;color:#fff;box-shadow:0 2px 8px rgba(232,18,45,.25)}
+.tip{background:#fff8f8;border:1.5px solid #fecaca;border-left:4px solid #e8122d;border-radius:10px;padding:12px 16px;margin-bottom:16px}
+.tip-t{font-size:13px;font-weight:800;color:#e8122d;margin-bottom:6px}
+.tip-b{font-size:12px;color:#555;line-height:1.9}.tip-b b{color:#1a1a2e}
+.upz{background:#fff;border:2.5px dashed #e5e7eb;border-radius:14px;padding:30px 20px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.upz:hover,.upz.drag{border-color:#e8122d;background:#fff8f8}
+.upz-i{font-size:42px;margin-bottom:8px}
+.upz-t{font-size:17px;font-weight:900;color:#1a1a2e;margin-bottom:5px}
+.upz-s{font-size:13px;color:#888;margin-bottom:12px}
+.upz-tgs{display:flex;flex-wrap:wrap;justify-content:center;gap:6px}
+.ztag{background:#f3f4f6;border-radius:20px;padding:3px 11px;font-size:12px;color:#555;font-weight:700}
+.pbar{background:#fff;border-radius:10px;padding:12px 16px;margin-bottom:12px;border:1px solid #eee}
+.pbar-tr{background:#f3f4f6;border-radius:6px;height:8px;overflow:hidden;margin:6px 0}
+.pbar-fl{height:100%;background:linear-gradient(90deg,#e8122d,#ff6b35);border-radius:6px;transition:width .25s}
+.pbar-tx{font-size:12px;color:#aaa;font-weight:700}
+.prev-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(75px,1fr));gap:8px;margin-bottom:14px}
+.thumb{position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;border:2.5px solid #e5e7eb;background:#f3f4f6;transition:border-color .3s}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.thumb .x{position:absolute;top:2px;right:2px;width:20px;height:20px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.sb{position:absolute;bottom:0;left:0;right:0;height:4px}
+.sb.done{background:#16a34a}.sb.working{background:#e8122d;animation:pulse .8s ease-in-out infinite}.sb.error{background:#dc2626}
+.thumb.done{border-color:#16a34a}.thumb.working{border-color:#e8122d}.thumb.error{border-color:#dc2626}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.2}}
+.fi{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #eee;border-radius:10px;padding:10px 14px;margin-bottom:8px}
+.fi.done{border-color:#16a34a}.fi.working{border-color:#e8122d}.fi.error{border-color:#dc2626}
+.fi-i{font-size:22px;width:30px;text-align:center;flex-shrink:0}
+.fi-inf{flex:1;min-width:0}
+.fi-n{font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fi-m{font-size:11px;color:#aaa;margin-top:1px}
+.fi-s{font-size:11px;font-weight:700}
+.fi-s.done{color:#16a34a}.fi-s.working{color:#e8122d}.fi-s.error{color:#dc2626}.fi-s.pending{color:#bbb}
+.delbtn{background:none;border:none;cursor:pointer;font-size:15px;opacity:.3;padding:3px}
+.delbtn:hover{opacity:1}
+.arow{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.btnx{flex:1;min-width:180px;background:#e8122d;color:#fff;border:none;border-radius:10px;padding:14px 20px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:900;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btnx:hover:not(:disabled){background:#c40e25;transform:translateY(-1px)}
+.btnx:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.btno{background:#fff;color:#1a1a2e;border:1.5px solid #e5e7eb;border-radius:10px;padding:14px 16px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer;transition:all .15s;white-space:nowrap}
+.btno:hover{border-color:#e8122d;color:#e8122d}
+.log{background:#1a1a2e;border-radius:10px;padding:12px;margin-bottom:14px;max-height:90px;overflow-y:auto;font-family:monospace;font-size:12px}
+.lok{color:#4ade80;margin-bottom:2px}.lerr{color:#f87171;margin-bottom:2px}.linf{color:#60a5fa;margin-bottom:2px}
+.tbl-top{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
+.srch{flex:1;min-width:140px;border:1.5px solid #e5e7eb;border-radius:8px;padding:9px 13px;font-family:'Nunito',sans-serif;font-size:14px;outline:none;background:#fff}
+.srch:focus{border-color:#e8122d}
+.exppnl{background:#fff;border:1px solid #eee;border-radius:12px;padding:14px;margin-bottom:12px}
+.exprow{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.expgrp{display:flex;flex-direction:column;gap:4px}
+.explbl{font-size:11px;font-weight:800;color:#bbb;text-transform:uppercase;letter-spacing:1px}
+.expinp{border:1.5px solid #e5e7eb;border-radius:8px;padding:8px 12px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;outline:none;width:110px}
+.expinp:focus{border-color:#e8122d}
+.btnexp{background:#fff;border:1.5px solid #e5e7eb;border-radius:8px;padding:9px 16px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer;transition:all .15s;white-space:nowrap}
+.btnexp.csv:hover{border-color:#16a34a;color:#16a34a}
+.btnexp.xls:hover{border-color:#2563eb;color:#2563eb}
+.tblwrap{background:#fff;border-radius:14px;border:1px solid #eee;overflow:hidden;overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:480px}
+thead{background:#f9fafb}
+th{padding:10px 12px;text-align:left;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#bbb;border-bottom:1px solid #eee;white-space:nowrap}
+tbody tr{border-bottom:1px solid #f5f5f5;transition:background .1s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:#fafafa}
+td{padding:7px 10px;vertical-align:middle}
+.tdnum{color:#ddd;font-size:11px;font-weight:800;width:28px;text-align:center}
+.cin{width:100%;border:1.5px solid transparent;border-radius:6px;padding:4px 7px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:600;outline:none;background:transparent;color:#1a1a2e;min-width:75px}
+.cin:focus{border-color:#e8122d;background:#fff8f8}
+.cin.ph{font-family:monospace;font-size:12px}
+.addrow{width:100%;background:#fafafa;border:none;border-top:1.5px dashed #eee;padding:10px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;color:#ccc;cursor:pointer;border-radius:0 0 14px 14px}
+.addrow:hover{color:#e8122d;background:#fff8f8}
+.ac{background:#fff;border-radius:14px;padding:16px;margin-bottom:12px;border:2px solid #e5e7eb;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.ac.green{border-color:#16a34a;background:#f0fdf4}
+.ac.yellow{border-color:#ca8a04;background:#fefce8}
+.ac.red{border-color:#dc2626;background:#fef2f2}
+.ac.approved{opacity:.65}
+.ac.ac-multi{border-color:#ca8a04;background:#fefce8}
+.ac-top{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px}
+.ac-ph{width:48px;height:48px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;border:2px solid #eee}
+.ac-meta{flex:1;min-width:0}
+.ac-name{font-size:15px;font-weight:900;color:#1a1a2e;margin-bottom:2px}
+.ac-src{font-size:11px;color:#aaa;font-weight:600;margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cbadge{display:inline-flex;align-items:center;gap:4px;border-radius:20px;padding:3px 10px;font-size:12px;font-weight:800}
+.cbadge.green{background:#dcfce7;color:#16a34a}
+.cbadge.yellow{background:#fef9c3;color:#ca8a04}
+.cbadge.red{background:#fee2e2;color:#dc2626}
+.acf{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px}
+.acfi{background:#f9fafb;border-radius:8px;padding:8px 10px}
+.acfl{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#bbb;margin-bottom:2px}
+.acfv input{width:100%;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;color:#1a1a2e;outline:none}
+.ac-rsn{font-size:11px;color:#888;font-style:italic;padding:6px 10px;background:#f9fafb;border-radius:6px;margin-bottom:10px}
+.ac-acts{display:flex;gap:8px}
+.btn-app{flex:1;background:#16a34a;color:#fff;border:none;border-radius:8px;padding:9px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer}
+.btn-app:hover{background:#15803d}
+.btn-app.done{background:#dcfce7;color:#16a34a;cursor:default}
+.btn-skp{flex:1;background:#f3f4f6;color:#888;border:1px solid #eee;border-radius:8px;padding:9px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer}
+.btn-skp:hover{border-color:#dc2626;color:#dc2626}
+.btn-skp.done{background:#fee2e2;color:#dc2626;border-color:#fecaca;cursor:default}
+.hist-item{background:#fff;border:1px solid #eee;border-radius:12px;padding:14px 16px;margin-bottom:10px}
+.h-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
+.h-date{font-size:13px;font-weight:800}
+.h-badge{background:#fff8f8;color:#e8122d;border:1px solid #fecaca;border-radius:20px;padding:2px 10px;font-size:11px;font-weight:800}
+.nohist{text-align:center;padding:40px;color:#bbb;font-size:14px}
+.mstats{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px;margin-bottom:14px;font-size:14px;line-height:2.1}
+.confli{background:#fafafa;border:1px solid #eee;border-radius:10px;padding:12px;margin-bottom:10px}
+.cfbts{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.cfb{flex:1;min-width:100px;padding:9px;border:2px solid #e5e7eb;background:#fff;border-radius:8px;cursor:pointer;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;color:#555}
+.cfb:hover,.cfb.chosen{border-color:#e8122d;background:#fff8f8;color:#e8122d}
+
+/* OPTION PICKER on cards */
+.opts-lbl{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#ca8a04;margin-bottom:6px}
+.opts-wrap{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+.opt-btn{background:#fff;border:2px solid #e5e7eb;border-radius:9px;padding:9px 12px;cursor:pointer;font-family:'Nunito',sans-serif;font-size:13px;text-align:left;transition:all .15s;line-height:1.4}
+.opt-btn:hover{border-color:#e8122d;background:#fff8f8}
+.opt-btn.selected{border-color:#16a34a;background:#f0fdf4}
+.opt-name{font-weight:800;color:#1a1a2e}
+.opt-desc{font-size:11px;color:#888;margin-top:2px}
+.opt-detail{font-size:12px;color:#555;margin-top:3px}
+
+
+/* PLATFORM SEARCH LINKS */
+.search-links{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.slink{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:20px;font-size:12px;font-weight:800;cursor:pointer;text-decoration:none;border:1.5px solid;transition:all .15s;white-space:nowrap}
+.slink:hover{opacity:.8;transform:translateY(-1px)}
+.slink-li{color:#0077b5;border-color:#0077b5;background:#f0f9ff}
+.slink-fb{color:#1877f2;border-color:#1877f2;background:#f0f4ff}
+.slink-tw{color:#000;border-color:#000;background:#f9f9f9}
+.slink-go{color:#e8122d;border-color:#e8122d;background:#fff8f8}
+.slink-cb{color:#f45;border-color:#f45;background:#fff5f5}
+.slink-all{color:#6b21a8;border-color:#6b21a8;background:#faf5ff}
+.btn-find{background:#faf5ff;color:#6b21a8;border:1.5px solid #6b21a8;border-radius:8px;padding:9px 12px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer}
+
+/* SEARCH TAB */
+.search-box{display:flex;gap:8px;margin-bottom:16px}
+.search-in{flex:1;border:1.5px solid #e5e7eb;border-radius:10px;padding:12px 16px;font-family:'Nunito',sans-serif;font-size:15px;outline:none;transition:border-color .15s}
+.search-in:focus{border-color:#e8122d}
+.search-results{display:flex;flex-direction:column;gap:8px}
+.sr-item{background:#fff;border:1px solid #eee;border-radius:12px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.sr-name{font-size:14px;font-weight:800;color:#1a1a2e}
+.sr-links{display:flex;gap:6px;flex-wrap:wrap}
+.search-hint{font-size:13px;color:#bbb;text-align:center;padding:30px;line-height:1.8}
+
+.footer{background:#1a1a2e;color:rgba(255,255,255,.4);text-align:center;padding:18px;font-size:12px;margin-top:32px}
+.footer img{height:26px;margin-bottom:6px;display:block;margin-left:auto;margin-right:auto;opacity:.6}
+.footer a{color:#e8122d}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#1a1a2e;color:#fff;padding:9px 20px;border-radius:30px;font-size:13px;font-weight:700;z-index:9999;white-space:nowrap;border-left:4px solid #e8122d;box-shadow:0 4px 20px rgba(0,0,0,.2);pointer-events:none}
+.hidden{display:none!important}
+@media(max-width:540px){
+.hdr{padding:0 12px;height:58px}.hero h1{font-size:16px}.main{padding:14px 12px 80px}
+.tabs{flex-wrap:wrap}.tbtn{min-width:55px;font-size:10px}
+.tbl-top,.exprow{flex-direction:column;align-items:stretch}.expinp{width:100%}
+}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div>
+    <img class="logo-img" src="https://www.gameon-group.com/wp-content/uploads/2025/11/Logo.png" alt="GameOn" onerror="this.style.display='none';document.getElementById('ltx').style.display='block'">
+    <div id="ltx" class="logo-txt" style="display:none">GAME ON <span>GROUP</span></div>
+  </div>
+  <div class="hdr-r">
+    <div class="tool-name">Contact Extractor</div>
+    <div class="tool-sub">Internal Team Tool</div>
+    <div class="badge">Internal Use Only</div>
+  </div>
+</div>
+
+<div class="hero">
+  <h1>AI-Powered <span>Contact Extraction</span></h1>
+  <p>Images · Video · Excel · CSV · PDF · vCard · Smart Scan · Merge</p>
+  <div class="stats">
+    <div class="st"><div class="st-n" id="sF">0</div><div class="st-l">Files</div></div>
+    <div class="sdiv"></div>
+    <div class="st"><div class="st-n" id="sC">0</div><div class="st-l">Contacts</div></div>
+    <div class="sdiv"></div>
+    <div class="st"><div class="st-n" id="sD">0</div><div class="st-l">Processed</div></div>
+    <div class="sdiv"></div>
+    <div class="st"><div class="st-n" id="sS">0</div><div class="st-l">Sessions</div></div>
+  </div>
+</div>
+
+<div class="main">
+
+<div class="card" id="settCard">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+    <div class="slbl" style="margin:0">🔑 API Key</div>
+  </div>
+  <div class="row">
+    <input class="inp" type="password" id="apiIn" placeholder="Paste Anthropic API key (sk-ant-...)" autocomplete="off">
+    <button class="btn-r" onclick="saveKey()">Save &amp; Hide</button>
+  </div>
+  <div class="hint">Get your key at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> → API Keys &nbsp;|&nbsp; <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="92fbfcf4fdd2f5f3fff7fdfcf5e0fde7e2f3e1fbf3bcf1fdff">[email&#160;protected]</a></div>
+</div>
+
+<div style="text-align:right;margin-bottom:12px;margin-top:-8px">
+  <button class="stbtn" onclick="document.getElementById('settCard').classList.toggle('hidden')">⚙️ Settings</button>
+</div>
+
+<div class="tabs">
+  <button class="tbtn active" id="tb-img" onclick="goTab('img')">📸 Screenshots</button>
+  <button class="tbtn" id="tb-file" onclick="goTab('file')">📁 Files</button>
+  <button class="tbtn" id="tb-video" onclick="goTab('video')">🎬 Video</button>
+  <button class="tbtn" id="tb-scan" onclick="goTab('scan')">🔍 Smart Scan</button>
+  <button class="tbtn" id="tb-merge" onclick="goTab('merge')">🧹 Merge</button>
+  <button class="tbtn" id="tb-hist" onclick="goTab('hist')">📋 History</button>
+  <button class="tbtn" id="tb-search" onclick="goTab('search')">🔎 Search</button>
+</div>
+
+<!-- SCREENSHOTS -->
+<div id="pane-img">
+  <div class="tip">
+    <div class="tip-t">📱 WhatsApp group capture tips</div>
+    <div class="tip-b"><b>1.</b> Open group → tap group name<br><b>2.</b> Scroll through members<br><b>3.</b> Screenshot as you scroll<br><b>4.</b> Upload all screenshots at once below</div>
+  </div>
+  <div class="upz" id="imgDrop" onclick="document.getElementById('imgInp').click()">
+    <div class="upz-i">📸</div>
+    <div class="upz-t">Tap or drop screenshots here</div>
+    <div class="upz-s">Select multiple images at once</div>
+    <div class="upz-tgs"><span class="ztag">📱 WhatsApp</span><span class="ztag">✈️ Telegram</span><span class="ztag">📞 Contacts</span><span class="ztag">📇 Business Cards</span></div>
+  </div>
+  <input type="file" id="imgInp" accept="image/*" multiple style="display:none" onchange="addImgs(this.files)">
+  <div class="pbar hidden" id="imgPbar"><div class="pbar-tr"><div class="pbar-fl" id="imgPfl" style="width:0%"></div></div><div class="pbar-tx" id="imgPtx">Loading...</div></div>
+  <div id="imgPrev" class="hidden">
+    <div class="prev-hdr">
+      <span style="font-size:12px;font-weight:800;color:#bbb;text-transform:uppercase;letter-spacing:1px" id="imgLbl"></span>
+      <div style="display:flex;gap:8px">
+        <button onclick="document.getElementById('imgInp').click()" class="btno" style="padding:5px 12px;font-size:12px">+ More</button>
+        <button class="btno" style="padding:5px 12px;font-size:12px;color:#e8122d;border-color:#fecaca" onclick="clearImgs()">Clear</button>
+      </div>
+    </div>
+    <div class="pgrid" id="imgGrid"></div>
+  </div>
+</div>
+
+<!-- FILES -->
+<div id="pane-file" class="hidden">
+  <div class="upz" id="fileDrop" onclick="document.getElementById('fileInp').click()">
+    <div class="upz-i">📁</div>
+    <div class="upz-t">Tap or drop files here</div>
+    <div class="upz-s">AI auto-detects and extracts from any format</div>
+    <div class="upz-tgs"><span class="ztag">📊 Excel</span><span class="ztag">📄 CSV</span><span class="ztag">📑 PDF</span><span class="ztag">📇 vCard</span><span class="ztag">📝 Text</span><span class="ztag">📃 Word</span></div>
+  </div>
+  <input type="file" id="fileInp" accept=".xlsx,.xls,.csv,.pdf,.vcf,.txt,.docx,.doc" multiple style="display:none" onchange="addDocFiles(this.files)">
+  <div id="fileList"></div>
+</div>
+
+<!-- VIDEO -->
+<div id="pane-video" class="hidden">
+  <div class="tip">
+    <div class="tip-t">🎬 Screen recording tip</div>
+    <div class="tip-b"><b>1.</b> Start screen recording on your phone<br><b>2.</b> Slowly scroll through contacts or group<br><b>3.</b> Upload video here — AI extracts unique frames</div>
+  </div>
+  <div class="upz" id="vidDrop" onclick="document.getElementById('vidInp').click()">
+    <div class="upz-i">🎬</div>
+    <div class="upz-t">Tap or drop video here</div>
+    <div class="upz-s">MP4, MOV, AVI — smart frame extraction</div>
+    <div class="upz-tgs"><span class="ztag">📱 MP4</span><span class="ztag">📱 MOV</span></div>
+  </div>
+  <input type="file" id="vidInp" accept="video/*" style="display:none" onchange="addVid(this.files[0])">
+  <div id="vidPrev" class="hidden" style="background:#1a1a2e;border-radius:12px;padding:14px;margin-bottom:14px">
+    <video id="vidEl" muted playsinline style="width:100%;border-radius:8px;max-height:180px;object-fit:contain"></video>
+    <div id="vidInfo" style="color:rgba(255,255,255,.6);font-size:12px;margin-top:6px;font-weight:600"></div>
+    <div style="margin-top:8px"><div class="pbar-tr"><div class="pbar-fl" id="vidPfl" style="width:0%"></div></div><div class="pbar-tx" id="vidPtx" style="color:#aaa">Ready</div></div>
+    <div id="framesGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(60px,1fr));gap:5px;margin-top:10px;max-height:180px;overflow-y:auto"></div>
+  </div>
+</div>
+
+<!-- SMART SCAN -->
+<div id="pane-scan" class="hidden">
+  <!-- scanInp lives outside all hidden divs so .click() always works -->
+  <input type="file" id="scanInp" accept="image/*" multiple style="display:none" onchange="startScan(this.files)">
+  <div id="scanEmpty" style="text-align:center;padding:40px 20px">
+    <div style="font-size:44px;margin-bottom:10px">🔍</div>
+    <div style="font-size:16px;font-weight:800;margin-bottom:6px">Smart Scan</div>
+    <div style="font-size:13px;color:#888;margin-bottom:18px;line-height:1.7">Upload screenshots from any platform — AI extracts contacts,<br>searches for missing data, shows you approval cards</div>
+    <button class="btnx" style="max-width:260px;margin:0 auto" onclick="document.getElementById('scanInp').click()">📸 Upload Screenshots</button>
+  </div>
+  <div id="scanProc" class="hidden">
+    <div class="card"><div class="slbl">⏳ Processing...</div>
+    <div class="pbar-tr" style="margin:8px 0 5px"><div class="pbar-fl" id="scanPfl" style="width:0%"></div></div>
+    <div class="pbar-tx" id="scanPtx">Starting...</div>
+    <div class="log" id="scanLog" style="margin-top:10px"></div></div>
+  </div>
+  <div id="scanRes" class="hidden">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+      <div><div style="font-size:15px;font-weight:900" id="scanTitle">Review Contacts</div><div style="font-size:12px;color:#888;margin-top:2px" id="scanSub"></div></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button onclick="appAll()" style="background:#16a34a;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer">✅ Approve All Green</button>
+        <button onclick="skipAll()" style="background:#f3f4f6;color:#888;border:1px solid #eee;border-radius:8px;padding:8px 14px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer">🚫 Skip All Red</button>
+      </div>
+    </div>
+    <div id="cardList"></div>
+    <div id="scanExp" class="hidden" style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btnx" onclick="expApp('csv')">📄 Export Approved CSV</button>
+      <button class="btnx" style="background:#1a1a2e" onclick="expApp('xlsx')">📊 Export Approved Excel</button>
+    </div>
+  </div>
+</div>
+
+<!-- MERGE -->
+<div id="pane-merge" class="hidden">
+  <div class="tip">
+    <div class="tip-t">🧹 Clean &amp; Merge</div>
+    <div class="tip-b"><b>1.</b> Upload multiple contact files<br><b>2.</b> Phone OR email OR name matches = same person → merged<br><b>3.</b> Keeps most complete data<br><b>4.</b> Name conflicts → you choose<br><b>5.</b> Download one clean merged file</div>
+  </div>
+  <div class="upz" id="mergeDrop" onclick="document.getElementById('mergeInp').click()">
+    <div class="upz-i">📂</div>
+    <div class="upz-t">Drop your contact files here</div>
+    <div class="upz-s">Upload as many files as you want to merge</div>
+    <div class="upz-tgs"><span class="ztag">📊 Excel</span><span class="ztag">📄 CSV</span><span class="ztag">📇 vCard</span><span class="ztag">📝 Text</span></div>
+  </div>
+  <input type="file" id="mergeInp" accept=".xlsx,.xls,.csv,.vcf,.txt" multiple style="display:none" onchange="addMergeFiles(this.files)">
+  <div id="mfList"></div>
+  <div class="arow hidden" id="mergeArow"><button class="btnx" id="mergeBtn" onclick="runMerge()">🧹 Clean &amp; Merge All Files</button></div>
+  <div class="pbar hidden" id="mergePbar"><div class="pbar-tr"><div class="pbar-fl" id="mergePfl" style="width:0%"></div></div><div class="pbar-tx" id="mergePtx">Processing...</div></div>
+  <div id="mergeConf" class="hidden"></div>
+  <div id="mergeStDiv" class="hidden"></div>
+</div>
+
+<!-- HISTORY -->
+<div id="pane-hist" class="hidden">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+    <div style="font-size:15px;font-weight:800">Past Sessions</div>
+    <button class="btno" style="padding:7px 14px;font-size:12px;color:#e8122d;border-color:#fecaca" onclick="clearHist()">🗑 Clear</button>
+  </div>
+  <div id="histList"></div>
+</div>
+
+<!-- EXTRACT BUTTON -->
+<div class="arow hidden" id="actRow">
+  <button class="btnx" id="extBtn" onclick="runExtraction()">⚡ Extract Contacts</button>
+  <button class="btno hidden" id="ddBtn" onclick="manualDedup()">🔁 Deduplicate</button>
+</div>
+
+<div class="pbar hidden" id="aiPbar"><div class="pbar-tr"><div class="pbar-fl" id="aiPfl" style="width:0%"></div></div><div class="pbar-tx" id="aiPtx">Analyzing...</div></div>
+<div class="log hidden" id="mainLog"></div>
+
+<!-- TABLE -->
+<div id="tblSec" class="hidden">
+  <div class="exppnl">
+    <div class="slbl">📤 Export Options</div>
+    <div class="exprow">
+      <div class="expgrp"><div class="explbl">Contacts per file (0=all)</div><input class="expinp" type="number" id="splitN" value="0" min="0"></div>
+      <button class="btnexp csv" onclick="doExport('csv')">📄 CSV</button>
+      <button class="btnexp xls" onclick="doExport('xlsx')">📊 Excel</button>
+    </div>
+    <div style="font-size:11px;color:#bbb;margin-top:6px">Set e.g. 100 to split into multiple files of 100 contacts each</div>
+  </div>
+  <div class="tbl-top">
+    <input class="srch" type="text" id="srchIn" placeholder="🔍 Search name, phone, email..." oninput="filterTbl(this.value)">
+    <button class="btno" onclick="manualDedup()" style="padding:9px 14px;font-size:13px">🔁 Dedup</button>
+  </div>
+  <div class="tblwrap">
+    <table><thead><tr><th>#</th><th>Name</th><th>Company</th><th>Phone</th><th>Email</th><th></th></tr></thead><tbody id="tbody"></tbody></table>
+    <button class="addrow" onclick="addRow()">+ Add row manually</button>
+  </div>
+</div>
+
+  <!-- SEARCH TAB -->
+  <div id="pane-search" class="hidden">
+    <div class="card">
+      <div class="slbl">🔎 Search Any Contact</div>
+      <div style="font-size:13px;color:#888;margin-bottom:12px">Type a name — we search LinkedIn, Facebook, Twitter, Google and Crunchbase. Hebrew names are searched in both Hebrew and English.</div>
+      <div class="search-box">
+        <input class="search-in" type="text" id="searchNameIn" placeholder="e.g. Tomer Rabinovich or שי סבן" onkeydown="if(event.key==='Enter')doSearch()">
+        <button class="btn-r" onclick="doSearch()">Search</button>
+      </div>
+      <div id="searchResults">
+        <div class="search-hint">
+          Enter a name above and click Search<br>
+          Links will open each platform in a new tab<br>
+          🔵 LinkedIn &nbsp; 🔵 Facebook &nbsp; ✖ Twitter &nbsp; 🔴 Google &nbsp; 🟠 Crunchbase
+        </div>
+      </div>
+    </div>
+
+    <!-- RECENT CONTACTS QUICK SEARCH -->
+    <div id="quickSearchSec" class="hidden">
+      <div class="slbl" style="margin-bottom:10px">⚡ Quick Search — From Your Contacts</div>
+      <div id="quickSearchList" class="search-results"></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  <img src="https://www.gameon-group.com/wp-content/uploads/2025/11/Logo.png" alt="">
+  Internal Tool &mdash; Game On Group &copy; 2026 &nbsp;|&nbsp;
+  <a href="https://www.gameon-group.com" target="_blank">gameon-group.com</a>
+</div>
+<div class="toast hidden" id="toast"></div><script data-cfasync="false">
+'use strict';
+var imgs=[],docs=[],contacts=[],scanRes=[],mFiles=[],mContacts=[],mConflicts=[];
+var idc=0,fQ='',curTab='img',curVid=null;
+
+// COOKIES
+function setCK(n,v,d){var e=new Date();e.setTime(e.getTime()+d*864e5);document.cookie=n+'='+encodeURIComponent(v)+';expires='+e.toUTCString()+';path=/;SameSite=Lax';}
+function getCK(n){var c=document.cookie.split(';');for(var i=0;i<c.length;i++){var p=c[i].trim();if(p.indexOf(n+'=')==0)return decodeURIComponent(p.substring(n.length+1));}return '';}
+
+// INIT
+(function(){
+  var baked='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';
+  if(!getCK('gog_k')&&!localStorage.getItem('gog_k')){
+    setCK('gog_k',baked,365); localStorage.setItem('gog_k',baked);
+  }
+  var k=getCK('gog_k')||localStorage.getItem('gog_k')||'';
+  if(k) document.getElementById('settCard').classList.add('hidden');
+  updateCounts(); updateSessCount();
+  window.addEventListener('message',function(e){
+    if(e.data&&e.data.type==='GOG_SCREENSHOTS'&&e.data.images) recvExt(e.data.images,e.data.meta||[]);
+  });
+})();
+
+// API KEY
+function saveKey(){
+  var v=document.getElementById('apiIn').value.trim();
+  if(!v){toast('Please paste your API key');return;}
+  if(!v.startsWith('sk-ant-')){toast('Key must start with sk-ant-');return;}
+  setCK('gog_k',v,365); localStorage.setItem('gog_k',v);
+  document.getElementById('settCard').classList.add('hidden');
+  toast('✅ API key saved permanently!');
+}
+function getKey(){return getCK('gog_k')||localStorage.getItem('gog_k')||'';}
+
+// TABS
+function goTab(t){
+  curTab=t;
+  ['img','file','video','scan','merge','hist','search'].forEach(function(k){
+    var p=document.getElementById('pane-'+k);
+    var b=document.getElementById('tb-'+k);
+    if(p) p.classList.toggle('hidden',k!==t);
+    if(b) b.classList.toggle('active',k===t);
+  });
+  if(t==='hist') renderHist();
+  if(t==='search') renderQuickSearch();
+  updActRow();
+}
+
+// DRAG & DROP
+['imgDrop','fileDrop','vidDrop','mergeDrop'].forEach(function(id){
+  var el=document.getElementById(id); if(!el) return;
+  el.addEventListener('dragover',function(e){e.preventDefault();el.classList.add('drag');});
+  el.addEventListener('dragleave',function(){el.classList.remove('drag');});
+  el.addEventListener('drop',function(e){
+    e.preventDefault(); el.classList.remove('drag');
+    if(id==='imgDrop') addImgs(e.dataTransfer.files);
+    else if(id==='fileDrop') addDocFiles(e.dataTransfer.files);
+    else if(id==='vidDrop'&&e.dataTransfer.files[0]) addVid(e.dataTransfer.files[0]);
+    else if(id==='mergeDrop') addMergeFiles(e.dataTransfer.files);
+  });
+});
+
+// IMAGES
+async function addImgs(files){
+  var arr=Array.from(files).filter(function(f){return f.type.startsWith('image/');});
+  if(!arr.length) return;
+  var bar=document.getElementById('imgPbar'); bar.classList.remove('hidden');
+  for(var i=0;i<arr.length;i++){
+    document.getElementById('imgPfl').style.width=Math.round((i+1)/arr.length*100)+'%';
+    document.getElementById('imgPtx').textContent='Loading '+(i+1)+' of '+arr.length+': '+arr[i].name;
+    await sleep(20);
+    imgs.push({id:++idc,file:arr[i],url:URL.createObjectURL(arr[i]),status:'pending'});
+  }
+  bar.classList.add('hidden');
+  renderImgs(); updateCounts(); updActRow();
+  toast(arr.length+' image'+(arr.length>1?'s':'')+' ready!');
+}
+
+function renderImgs(){
+  var sec=document.getElementById('imgPrev');
+  if(!imgs.length){sec.classList.add('hidden');return;}
+  sec.classList.remove('hidden');
+  document.getElementById('imgLbl').textContent=imgs.length+' image'+(imgs.length!==1?'s':'')+' queued';
+  document.getElementById('imgGrid').innerHTML=imgs.map(function(img){
+    return '<div class="thumb '+(img.status!=='pending'?img.status:'')+'" id="th_'+img.id+'">'+
+      '<img src="'+img.url+'" alt="" loading="lazy">'+
+      '<button class="x" onclick="rmImg('+img.id+')">×</button>'+
+      '<div class="sb '+(img.status!=='pending'?img.status:'')+'"></div>'+
+    '</div>';
+  }).join('');
+}
+
+function rmImg(id){imgs=imgs.filter(function(i){return i.id!==id;});renderImgs();updateCounts();updActRow();}
+function clearImgs(){imgs=[];renderImgs();updateCounts();updActRow();}
+function setIS(id,s){
+  var it=imgs.find(function(i){return i.id===id;}); if(it) it.status=s;
+  var el=document.getElementById('th_'+id); if(!el) return;
+  el.className='thumb '+s; el.querySelector('.sb').className='sb '+s;
+}
+
+// DOC FILES
+function addDocFiles(files){
+  var arr=Array.from(files); if(!arr.length) return;
+  arr.forEach(function(f){docs.push({id:++idc,file:f,ext:f.name.split('.').pop().toLowerCase(),status:'pending'});});
+  renderDocs(); updateCounts(); updActRow();
+  toast(arr.length+' file'+(arr.length>1?'s':'')+' added!');
+}
+
+function renderDocs(){
+  var ic={xlsx:'📊',xls:'📊',csv:'📄',pdf:'📑',vcf:'📇',txt:'📝',docx:'📃',doc:'📃'};
+  document.getElementById('fileList').innerHTML=docs.map(function(it){
+    var st=it.status==='done'?'✓ Done':it.status==='error'?'✗ Error':it.status==='working'?'⏳...':'Pending';
+    var sc=it.status==='done'?'#16a34a':it.status==='error'?'#dc2626':it.status==='working'?'#e8122d':'#bbb';
+    return '<div class="fi '+it.status+'" id="df_'+it.id+'">'+
+      '<div class="fi-i">'+(ic[it.ext]||'📎')+'</div>'+
+      '<div class="fi-inf"><div class="fi-n">'+esc(it.file.name)+'</div><div class="fi-m">'+fsz(it.file.size)+' · '+it.ext.toUpperCase()+'</div></div>'+
+      '<div class="fi-s" style="color:'+sc+'">'+st+'</div>'+
+      '<button class="delbtn" onclick="rmDoc('+it.id+')">🗑</button>'+
+    '</div>';
+  }).join('');
+}
+
+function rmDoc(id){docs=docs.filter(function(f){return f.id!==id;});renderDocs();updateCounts();updActRow();}
+function setDS(id,s){var it=docs.find(function(i){return i.id===id;});if(it)it.status=s;renderDocs();}
+
+// VIDEO
+function addVid(file){
+  if(!file||!file.type.startsWith('video/')) return;
+  curVid=file;
+  var prev=document.getElementById('vidPrev'); prev.classList.remove('hidden');
+  document.getElementById('vidEl').src=URL.createObjectURL(file);
+  document.getElementById('vidInfo').textContent=file.name+' ('+fsz(file.size)+')';
+  document.getElementById('vidPtx').textContent='Click Extract Contacts to start';
+  document.getElementById('vidPfl').style.width='0%';
+  document.getElementById('framesGrid').innerHTML='';
+  updateCounts(); updActRow(); toast('Video loaded!');
+}
+
+async function extractFrames(file,onP){
+  return new Promise(function(res,rej){
+    var vid=document.createElement('video'); vid.muted=true;
+    vid.src=URL.createObjectURL(file); vid.load();
+    vid.addEventListener('error',rej);
+    vid.addEventListener('loadedmetadata',async function(){
+      var dur=vid.duration;
+      if(!dur||isNaN(dur)){rej(new Error('Cannot read video'));return;}
+      var W=vid.videoWidth||1280,H=vid.videoHeight||720;
+      var cv=document.createElement('canvas'); cv.width=W; cv.height=H;
+      var cx=cv.getContext('2d');
+      var cm=document.createElement('canvas'); cm.width=64; cm.height=64;
+      var cmx=cm.getContext('2d');
+      var frames=[],prev=null;
+      for(var t=0;t<=dur;t+=0.5){
+        onP(t,dur);
+        await seekV(vid,t);
+        cx.drawImage(vid,0,0,W,H); cmx.drawImage(vid,0,0,64,64);
+        var d=cmx.getImageData(0,0,64,64).data;
+        var diff=prev?fDiff(prev,d):1;
+        if(diff>0.06){frames.push(cv.toDataURL('image/jpeg',0.8));prev=Array.from(d);}
+      }
+      res(frames);
+    });
+  });
+}
+function seekV(v,t){return new Promise(function(r){function done(){v.removeEventListener('seeked',done);r();}v.addEventListener('seeked',done);v.currentTime=t;});}
+function fDiff(a,b){var d=0;for(var i=0;i<a.length;i+=4)d+=Math.abs(a[i]-b[i])+Math.abs(a[i+1]-b[i+1])+Math.abs(a[i+2]-b[i+2]);return d/(a.length/4*765);}
+
+// ACTION ROW
+function updActRow(){
+  var hp=false;
+  if(curTab==='img') hp=imgs.some(function(i){return i.status==='pending';});
+  else if(curTab==='file') hp=docs.some(function(i){return i.status==='pending';});
+  else if(curTab==='video') hp=!!curVid;
+  var any=imgs.length||docs.length||curVid;
+  var show=any&&curTab!=='scan'&&curTab!=='merge'&&curTab!=='hist';
+  document.getElementById('actRow').classList.toggle('hidden',!show);
+  var n=curTab==='img'?imgs.filter(function(i){return i.status==='pending';}).length:
+        curTab==='file'?docs.filter(function(i){return i.status==='pending';}).length:(curVid?1:0);
+  var btn=document.getElementById('extBtn');
+  btn.disabled=!hp;
+  btn.textContent=curTab==='video'&&curVid?'⚡ Extract from Video':'⚡ Extract Contacts ('+n+' pending)';
+}
+
+// EXTRACTION
+async function runExtraction(){
+  var key=getKey();
+  if(!key){document.getElementById('settCard').classList.remove('hidden');toast('Please enter your API key first');return;}
+  document.getElementById('extBtn').disabled=true;
+  document.getElementById('mainLog').innerHTML=''; document.getElementById('mainLog').classList.remove('hidden');
+  document.getElementById('aiPbar').classList.remove('hidden');
+  var start=contacts.length;
+  try{
+    if(curTab==='img') await doImgs(key);
+    else if(curTab==='file') await doDocs(key);
+    else if(curTab==='video') await doVid(key);
+  }catch(e){
+    mlog('Fatal error: '+e.message+' — Check browser console for details','lerr');
+    console.error('Extraction error:',e);
+  }
+  document.getElementById('extBtn').disabled=false; updActRow();
+  if(contacts.length>start){document.getElementById('tblSec').classList.remove('hidden');document.getElementById('ddBtn').classList.remove('hidden');renderTbl();}
+  updateCounts();
+}
+
+async function doImgs(key){
+  var pending=imgs.filter(function(i){return i.status==='pending';}),total=0;
+  for(var i=0;i<pending.length;i++){
+    var img=pending[i];
+    setAP(i,pending.length,'Analyzing image '+(i+1)+' of '+pending.length+'...');
+    setIS(img.id,'working');
+    try{
+      var b64=await toB64(img.file);
+      var mime2='image/jpeg';
+      if(b64.startsWith('iVBOR')) mime2='image/png';
+      else if(b64.startsWith('R0lGO')) mime2='image/gif';
+      else if(b64.startsWith('UklG')) mime2='image/webp';
+      var r=await callClaudeVision(key,b64,mime2,'List every person visible in this image. Return ONLY JSON array: [{"name":"","phone":"","email":"","company":""}]. Include everyone even if only their name is visible.');
+      var added=parseC(r); contacts=contacts.concat(added); total+=added.length;
+      mlog('✓ '+added.length+' contacts — '+img.file.name,'lok'); setIS(img.id,'done');
+    }catch(e){var em=e.message||String(e);if(em.indexOf('fetch')>=0||em.indexOf('network')>=0||em.toLowerCase().indexOf('failed')>=0)em='Network error — check internet connection and API key';mlog('✗ '+img.file.name+': '+em,'lerr');setIS(img.id,'error');}
+  }
+  var rem=autoDd();
+  setAP(pending.length,pending.length,'✅ Done — '+contacts.length+' contacts'+(rem?' ('+rem+' dupes removed)':''));
+  toast('✅ '+contacts.length+' contacts'+(rem?' · '+rem+' dupes removed':''));
+  saveSess({type:'screenshots',fc:pending.length,cc:contacts.length});
+}
+
+async function doDocs(key){
+  var pending=docs.filter(function(i){return i.status==='pending';}),total=0;
+  for(var i=0;i<pending.length;i++){
+    var it=pending[i];
+    setAP(i,pending.length,'Processing '+(i+1)+'/'+pending.length+': '+it.file.name);
+    setDS(it.id,'working');
+    try{
+      var added=[];
+      if(['xlsx','xls','csv'].indexOf(it.ext)>=0) added=await procXLS(it.file,key);
+      else if(it.ext==='vcf') added=await procVCF(it.file);
+      else if(it.ext==='pdf') added=await procPDF(it.file,key);
+      else added=await procTXT(it.file,key);
+      contacts=contacts.concat(added); total+=added.length;
+      mlog('✓ '+added.length+' contacts — '+it.file.name,'lok'); setDS(it.id,'done');
+    }catch(e){mlog('✗ '+it.file.name+': '+e.message,'lerr');setDS(it.id,'error');}
+  }
+  var rem=autoDd();
+  setAP(pending.length,pending.length,'✅ Done — '+contacts.length+' contacts');
+  toast('✅ '+contacts.length+' contacts'); saveSess({type:'files',fc:pending.length,cc:contacts.length});
+}
+
+async function doVid(key){
+  if(!curVid) return;
+  mlog('🎬 Extracting smart frames...','linf');
+  setAP(0,1,'Scanning video...');
+  var frames=[];
+  try{frames=await extractFrames(curVid,function(t,dur){setAP(t,dur*2,'Scanning '+t.toFixed(1)+'s...');document.getElementById('vidPfl').style.width=Math.round(t/dur*50)+'%';});}
+  catch(e){mlog('✗ '+e.message,'lerr');return;}
+  mlog('📊 '+frames.length+' unique frames','linf');
+  document.getElementById('framesGrid').innerHTML=frames.map(function(f,i){return '<div style="aspect-ratio:1;border-radius:6px;overflow:hidden;border:1.5px solid rgba(255,255,255,.15)"><img src="'+f+'" style="width:100%;height:100%;object-fit:cover"></div>';}).join('');
+  var total=0;
+  for(var i=0;i<frames.length;i++){
+    var pct=50+Math.round((i+1)/frames.length*50);
+    setAP(pct,100,'Frame '+(i+1)+' of '+frames.length+'...');
+    document.getElementById('vidPfl').style.width=pct+'%';
+    document.getElementById('vidPtx').textContent='Analyzing frame '+(i+1)+' of '+frames.length;
+    try{
+      var b64=frames[i].split(',')[1];
+      var r=await callClaude(key,[{type:'image',source:{type:'base64',media_type:'image/jpeg',data:b64}},{type:'text',text:'Extract contacts. Return ONLY JSON: [{"name":"","phone":"","email":"","company":""}]. Return [] if none.'}]);
+      var added=parseC(r); if(added.length){contacts=contacts.concat(added);total+=added.length;mlog('✓ Frame '+(i+1)+': '+added.length,'lok');}
+    }catch(e){mlog('✗ Frame '+(i+1)+': '+e.message,'lerr');}
+  }
+  document.getElementById('vidPtx').textContent='✅ Done — '+total+' contacts from '+frames.length+' frames';
+  var rem=autoDd(); setAP(100,100,'✅ Done — '+contacts.length+' unique contacts');
+  curVid=null; updActRow(); toast('✅ '+contacts.length+' contacts from video');
+  saveSess({type:'video',fc:1,cc:contacts.length,fa:frames.length});
+}
+
+// FILE PROCESSORS
+async function procXLS(file,key){
+  return new Promise(function(res,rej){
+    var reader=new FileReader();
+    reader.onload=async function(e){
+      try{
+        var wb=XLSX.read(e.target.result,{type:'array'});
+        var ws=wb.Sheets[wb.SheetNames[0]];
+        var rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+        if(!rows.length){res([]);return;}
+        var sample=rows.slice(0,5).map(function(r){return r.join(' | ');}).join('\n');
+        var ms=await callT(key,'Spreadsheet:\n'+sample+'\n\nWhich 0-based column is name,phone,email,company? Return ONLY JSON: {"name":0,"phone":1,"email":2,"company":3}. Use null if not found.');
+        var m={name:null,phone:null,email:null,company:null};
+        try{m=JSON.parse(ms.replace(/```json|```/g,'').trim());}catch(e){}
+        var st=0;
+        if(rows[0]&&m.name!==null){var v=String(rows[0][m.name]||'').toLowerCase();if(v==='name'||v==='שם')st=1;}
+        var added=[];
+        for(var i=st;i<rows.length;i++){
+          var row=rows[i];
+          var n=m.name!==null?String(row[m.name]||'').trim():'';
+          var p=m.phone!==null?String(row[m.phone]||'').trim():'';
+          var em=m.email!==null?String(row[m.email]||'').trim():'';
+          var co=m.company!==null?String(row[m.company]||'').trim():'';
+          if(n||p||em)added.push({id:++idc,name:n,phone:p,email:em,company:co});
+        }
+        res(added);
+      }catch(e){rej(e);}
+    };
+    reader.onerror=rej; reader.readAsArrayBuffer(file);
+  });
+}
+
+async function procVCF(file){
+  return new Promise(function(res,rej){
+    var reader=new FileReader();
+    reader.onload=function(e){
+      var cards=e.target.result.split('BEGIN:VCARD'),added=[];
+      cards.forEach(function(card){
+        if(!card.trim())return;
+        var name='',phone='',email='',company='';
+        card.split('\n').forEach(function(line){
+          line=line.trim();
+          if(line.startsWith('FN:'))name=line.substring(3).trim();
+          else if(line.startsWith('N:')&&!name){var p=line.substring(2).split(';');name=((p[1]||'')+' '+(p[0]||'')).trim();}
+          else if(line.indexOf('TEL')===0){var v=line.split(':');if(v[1])phone=v[1].trim();}
+          else if(line.indexOf('EMAIL')===0){var v=line.split(':');if(v[1])email=v[1].trim();}
+          else if(line.startsWith('ORG:'))company=line.substring(4).trim();
+        });
+        if(name||phone)added.push({id:++idc,name:name,phone:phone,email:email,company:company});
+      });
+      res(added);
+    };
+    reader.onerror=rej; reader.readAsText(file);
+  });
+}
+
+async function procPDF(file,key){
+  return new Promise(function(res,rej){
+    var reader=new FileReader();
+    reader.onload=async function(e){
+      try{
+        var b64=btoa(String.fromCharCode.apply(null,new Uint8Array(e.target.result)));
+        var r=await callClaude(key,[{type:'document',source:{type:'base64',media_type:'application/pdf',data:b64}},{type:'text',text:'Extract all contacts. Return ONLY JSON: [{"name":"","phone":"","email":"","company":""}]'}]);
+        res(parseC(r));
+      }catch(e){rej(e);}
+    };
+    reader.onerror=rej; reader.readAsArrayBuffer(file);
+  });
+}
+
+async function procTXT(file,key){
+  return new Promise(function(res,rej){
+    var reader=new FileReader();
+    reader.onload=async function(e){
+      try{
+        var r=await callT(key,'Extract all contacts. All languages.\n\n'+e.target.result+'\n\nReturn ONLY JSON: [{"name":"","phone":"","email":"","company":""}]');
+        res(parseC(r));
+      }catch(e){rej(e);}
+    };
+    reader.onerror=rej; reader.readAsText(file);
+  });
+}
+
+// CLAUDE API
+var SYS='You extract people from images. Return ONLY a JSON array. Include every person even if only their name is visible. No markdown. Support all languages including Hebrew and Arabic.';
+async function callClaude(key,msgs,sysOverride){
+  var sys=sysOverride||SYS;
+  var res=await fetch('https://cors.sh/https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','x-cors-api-key':'temp_b9d5a8e4c2f1'},
+    body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:2000,system:sys,messages:[{role:'user',content:msgs}]})
+  });
+  var data=await res.json();
+  if(!res.ok){var msg=(data.error&&data.error.message)||'HTTP '+res.status+' error';if(res.status===401)msg='Invalid API key — check Settings';throw new Error(msg);}
+  return (data.content||[]).map(function(b){return b.text||'';}).join('').replace(/```json|```/g,'').trim();
+}
+async function callT(key,text){return callClaude(key,[{type:'text',text:text}]);}
+
+async function callClaudeVision(key,b64,mime,prompt){
+  var sys='Return ONLY a valid JSON array. No text before or after. No markdown. Example: [{"name":"John Smith","phone":"","email":"","company":""}]';
+  var res=await fetch('https://cors.sh/https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','x-cors-api-key':'temp_b9d5a8e4c2f1'},
+    body:JSON.stringify({
+      model:'claude-sonnet-4-6',
+      max_tokens:2000,
+      system:sys,
+      messages:[{role:'user',content:[
+        {type:'image',source:{type:'base64',media_type:mime,data:b64}},
+        {type:'text',text:prompt}
+      ]}]
+    })
+  });
+  var data=await res.json();
+  if(!res.ok){var msg=(data.error&&data.error.message)||'Error '+res.status;if(res.status===401)msg='Invalid API key';throw new Error(msg);}
+  return (data.content||[]).map(function(b){return b.text||'';}).join('').replace(/```json|```/g,'').trim();
+}
+function parseC(raw){
+  var p=[];
+  try{p=JSON.parse(raw);if(!Array.isArray(p))p=[];}catch(e){}
+  return p.filter(function(c){return (c.name&&c.name.trim().length>1)||c.phone||c.email;})
+    .map(function(c){return{id:++idc,name:(c.name||'').trim(),phone:(c.phone||'').trim(),email:(c.email||'').trim(),company:(c.company||'').trim()};});
+}
+
+// TABLE
+function renderTbl(){
+  var q=fQ.toLowerCase();
+  var rows=contacts.filter(function(c){return !q||c.name.toLowerCase().includes(q)||c.phone.includes(q)||c.email.toLowerCase().includes(q);});
+  document.getElementById('tbody').innerHTML=rows.map(function(c,i){
+    return '<tr><td class="tdnum">'+(i+1)+'</td>'+
+      '<td><input class="cin" value="'+esc(c.name)+'" placeholder="Name" onchange="upd('+c.id+',\'name\',this.value)"></td>'+
+      '<td><input class="cin" value="'+esc(c.company)+'" placeholder="Company" onchange="upd('+c.id+',\'company\',this.value)"></td>'+
+      '<td><input class="cin ph" value="'+esc(c.phone)+'" placeholder="+xxx" onchange="upd('+c.id+',\'phone\',this.value)"></td>'+
+      '<td><input class="cin" value="'+esc(c.email)+'" placeholder="email" onchange="upd('+c.id+',\'email\',this.value)"></td>'+
+      '<td><button class="delbtn" onclick="delR('+c.id+')">🗑</button></td></tr>';
+  }).join('');
+}
+function esc(v){return(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function upd(id,f,v){var c=contacts.find(function(c){return c.id===id;});if(c)c[f]=v;}
+function delR(id){contacts=contacts.filter(function(c){return c.id!==id;});renderTbl();updateCounts();}
+function addRow(){contacts.push({id:++idc,name:'',phone:'',email:'',company:''});renderTbl();updateCounts();}
+function filterTbl(q){fQ=q;renderTbl();}
+function autoDd(){
+  var seen=new Set(),b=contacts.length;
+  contacts=contacts.filter(function(c){var k=c.name.toLowerCase().trim()+'|'+c.phone.replace(/\s/g,'').trim()+'|'+c.email.toLowerCase().trim();if(seen.has(k)&&k!=='||')return false;seen.add(k);return true;});
+  return b-contacts.length;
+}
+function manualDedup(){var rem=autoDd();renderTbl();updateCounts();toast('Removed '+rem+' duplicate'+(rem!==1?'s':''));}
+
+// EXPORT
+function doExport(fmt){
+  if(!contacts.length){toast('No contacts to export');return;}
+  var sn=parseInt(document.getElementById('splitN').value)||0;
+  var chunks=sn>0&&sn<contacts.length?chunkA(contacts,sn):[contacts];
+  var ts=new Date().toISOString().replace(/[:T]/g,'-').split('.')[0];
+  chunks.forEach(function(ch,i){
+    var sfx=chunks.length>1?'-'+(i+1):'';
+    var fname='GameOn-Contacts'+sfx+'-'+ts+'.'+(fmt==='csv'?'csv':'xlsx');
+    dlBlob(fmt==='csv'?mkCSV(ch):mkXLSX(ch),fname);
+  });
+  toast('✅ Exported '+(chunks.length>1?chunks.length+' files':'1 file')+' ('+contacts.length+' contacts)');
+}
+function mkCSV(rows){
+  var lines=rows.map(function(c){return '"'+(c.name||'').replace(/"/g,'""')+'","'+(c.company||'').replace(/"/g,'""')+'","'+(c.phone||'').replace(/"/g,'""')+'","'+(c.email||'').replace(/"/g,'""')+'"';});
+  return new Blob(['\uFEFF'+'Name,Company,Phone,Email\n'+lines.join('\n')],{type:'text/csv;charset=utf-8;'});
+}
+function mkXLSX(rows){
+  var ws=XLSX.utils.json_to_sheet(rows.map(function(c){return{Name:c.name,Company:c.company,Phone:c.phone,Email:c.email};}));
+  ws['!cols']=[{wch:28},{wch:24},{wch:20},{wch:32}];
+  var wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'Contacts');
+  return new Blob([XLSX.write(wb,{bookType:'xlsx',type:'array'})],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+}
+function chunkA(arr,n){var r=[];for(var i=0;i<arr.length;i+=n)r.push(arr.slice(i,i+n));return r;}
+function dlBlob(blob,name){var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();}
+
+// SMART SCAN
+function recvExt(images,meta){
+  goTab('scan');
+  var files=images.map(function(d,i){return{dataUrl:d,title:(meta[i]||{}).title||'',url:(meta[i]||{}).url||''};});
+  procScan(files);
+}
+
+function startScan(fileList){
+  goTab('scan');
+  var arr=Array.from(fileList).filter(function(f){return f.type.startsWith('image/');});
+  Promise.all(arr.map(function(f){return new Promise(function(res){var r=new FileReader();r.onload=function(e){res({dataUrl:e.target.result,title:f.name,url:''});};r.readAsDataURL(f);});})).then(procScan);
+}
+
+async function procScan(items){
+  if(!items.length) return;
+  var key=getKey();
+  if(!key){document.getElementById('settCard').classList.remove('hidden');toast('Please enter your API key first');return;}
+  document.getElementById('scanEmpty').classList.add('hidden');
+  document.getElementById('scanProc').classList.remove('hidden');
+  document.getElementById('scanRes').classList.add('hidden');
+  document.getElementById('scanLog').innerHTML='';
+  // Don't clear scanRes - append to existing results
+  var all=[];
+  for(var i=0;i<items.length;i++){
+    setSP(i,items.length*2,'Extracting from image '+(i+1)+' of '+items.length+'...');
+    slog('🔍 Analyzing: '+(items[i].title||'screenshot'),'linf');
+    try{
+      var b64=items[i].dataUrl.split(',')[1];
+      var mime='image/jpeg';
+      if(b64.startsWith('iVBOR')) mime='image/png';
+      else if(b64.startsWith('R0lGO')) mime='image/gif';
+      else if(b64.startsWith('UklG')) mime='image/webp';
+      var scanPrompt='List every single person visible in this image. This may be a Facebook friends list, WhatsApp group, contacts screen, or similar. For each person write their name. Return ONLY JSON array: [{"name":"Dvir Cohen","phone":"","email":"","company":""},{"name":"Nir Raveh","phone":"","email":"","company":""}]. One object per person. Include Hebrew names as-is.';
+      var r=await callClaudeVision(key,b64,mime,scanPrompt);
+      var ex=parseC(r);
+      ex.forEach(function(c){c.srcTitle=items[i].title;c.srcUrl=items[i].url;});
+      all=all.concat(ex);
+      slog('✓ Found '+ex.length+' contacts','lok');
+    }catch(e){slog('✗ '+e.message,'lerr');}
+  }
+  slog('📊 '+all.length+' total — enriching...','linf');
+  for(var j=0;j<all.length;j++){
+    var c=all[j];
+    setSP(items.length+j,items.length*2,'Enriching '+(c.name||'contact')+' ('+(j+1)+'/'+all.length+')...');
+    var hasAll=c.email&&c.phone;
+    var hasSome=c.email||c.phone;
+    var conf=hasAll?90:hasSome?65:30;
+    var reason=hasAll?'Complete data extracted from screenshot':hasSome?'Partial data — searching for missing fields':'Name only — searching web for contact details';
+    var cc=conf>=75?'green':conf>=40?'yellow':'red';
+    var enrichOptions=[];
+    if(!hasAll&&c.name&&!hasSome){
+      try{
+        var en=await enrichC(c,key);
+        conf=en.confidence||conf;
+        reason=en.reason||reason;
+        cc=conf>=75?'green':conf>=40?'yellow':'red';
+        enrichOptions=en.options||[];
+        // If exactly one option — auto-fill fields
+        if(enrichOptions.length===1){
+          if(enrichOptions[0].email&&!c.email) c.email=enrichOptions[0].email;
+          if(enrichOptions[0].phone&&!c.phone) c.phone=enrichOptions[0].phone;
+          if(enrichOptions[0].company&&!c.company) c.company=enrichOptions[0].company;
+          enrichOptions=[]; // no need to show picker for single result
+        }
+        // Multiple options — leave fields empty, show picker on card
+      }catch(e){ reason='Search failed — fill manually'; }
+    } else if(hasSome&&!hasAll){
+      reason='Partial data — add missing fields manually';
+    }
+    scanRes.push({id:++idc,name:c.name||'',phone:c.phone||'',email:c.email||'',company:c.company||'',source:c.srcTitle||'',confidence:conf,cc:cc,reason:reason,options:enrichOptions,approved:false,skipped:false});
+    slog((cc==='green'?'🟢':cc==='yellow'?'🟡':'🔴')+' '+(c.name||'Unknown')+' — '+conf+'%','lok');
+  }
+  var seen=new Set();
+  scanRes=scanRes.filter(function(r){var k=r.name.toLowerCase()+'|'+r.phone.replace(/\s/g,'')+'|'+r.email.toLowerCase();if(seen.has(k)&&k!=='||')return false;seen.add(k);return true;});
+  setSP(items.length*2,items.length*2,'✅ Done — '+scanRes.length+' contacts ready');
+  setTimeout(function(){document.getElementById('scanProc').classList.add('hidden');showCards();},500);
+}
+
+async function enrichC(c,key){
+  var name=(c.name||'').trim();
+  if(!name) return{confidence:10,reason:'No name to search',options:[]};
+
+  // Detect Hebrew and build transliterated version
+  var isHebrew=/[֐-׿]/.test(name);
+  var searchName=name;
+  var hebrewHint='';
+  if(isHebrew){
+    hebrewHint=' Also search the English transliteration of this Hebrew name.';
+    searchName=name; // Claude will handle transliteration in the prompt
+  }
+
+  try{
+    var prompt='Search for contact information for this person: "'+name+'"'+(c.company?' who works at '+c.company:'')+'.'+hebrewHint+
+      ' If multiple people have this name, list ALL of them as separate options.'+
+      ' For each option find: email, phone, company, and a short description (max 8 words) to tell them apart.'+
+      ' Return ONLY valid JSON (no markdown):'+
+      ' {"options":[{"name":"","email":"","phone":"","company":"","description":"brief role/location"}],"confidence":0,"reason":"one short sentence max 15 words"}'+
+      ' Confidence: 70+ if unique name with verified data, 40-69 if common name or partial data, under 40 if nothing found.'+
+      ' Keep company field SHORT — job title + company name only, max 5 words. No movie titles or descriptions.';
+
+    var res=await fetch('https://cors.sh/https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','x-cors-api-key':'temp_b9d5a8e4c2f1'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-6',
+        max_tokens:1500,
+        tools:[{type:'web_search_20250305',name:'web_search'}],
+        system:'You are a contact researcher. Always search the web. Return ONLY JSON, no markdown, no explanation outside JSON.',
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+    var data=await res.json();
+    if(!res.ok) return{confidence:20,reason:'Search failed',options:[]};
+    var text=(data.content||[]).filter(function(b){return b.type==='text';}).map(function(b){return b.text;}).join('');
+    text=text.replace(/```json|```/g,'').trim();
+    var m=text.match(/\{[\s\S]*\}/);
+    if(!m) return{confidence:20,reason:'No results found',options:[]};
+    var parsed=JSON.parse(m[0]);
+    // Truncate reason to max 15 words
+    if(parsed.reason){
+      var words=parsed.reason.split(' ');
+      if(words.length>15) parsed.reason=words.slice(0,15).join(' ')+'...';
+    }
+    parsed.options=parsed.options||[];
+    return parsed;
+  }catch(e){
+    return{confidence:15,reason:'Search error',options:[]};
+  }
+}
+
+function showCards(){
+  // Always show the upload button again for next scan
+  document.getElementById('scanEmpty').classList.remove('hidden');
+  document.getElementById('scanEmpty').style.paddingTop='0';
+  document.getElementById('scanEmpty').querySelector('button').textContent='📸 Upload More Screenshots';
+  document.getElementById('scanEmpty').querySelector('div:first-child').style.display='none'; // hide big icon
+  document.getElementById('scanEmpty').querySelectorAll('div')[1].style.display='none'; // hide title
+  document.getElementById('scanEmpty').querySelectorAll('div')[2].style.display='none'; // hide subtitle
+  // Reset file input so same file can be re-uploaded
+  var inp=document.getElementById('scanInp'); inp.value=''; 
+  if(scanRes.length===0){
+    toast('No contacts found — try a clearer screenshot or check API key');
+    return;
+  }
+  document.getElementById('scanRes').classList.remove('hidden');
+  var g=scanRes.filter(function(r){return r.cc==='green'&&!r.skipped;}).length;
+  var y=scanRes.filter(function(r){return r.cc==='yellow'&&!r.skipped;}).length;
+  var rd=scanRes.filter(function(r){return r.cc==='red'&&!r.skipped;}).length;
+  var total=scanRes.filter(function(r){return !r.skipped;}).length;
+  document.getElementById('scanTitle').textContent=total+' Contacts Found';
+  document.getElementById('scanSub').textContent='🟢 '+g+' high · 🟡 '+y+' review · 🔴 '+rd+' low confidence';
+  renderCards();
+}
+
+function renderCards(){
+  var html=scanRes.filter(function(r){return !r.skipped;}).map(function(r){
+    var src=r.source||'';
+    var srcLabel=src.indexOf('facebook')>=0?'📘 Facebook':src.indexOf('linkedin')>=0?'💼 LinkedIn':src.indexOf('whatsapp')>=0?'💬 WhatsApp':'📸 Screenshot';
+    var optsHtml='';
+    if(r.options&&r.options.length>1){
+      optsHtml='<div class="opts-lbl">⚠️ Multiple people found — tap to choose:</div><div class="opts-wrap">';
+      for(var oi=0;oi<r.options.length;oi++){
+        var op=r.options[oi];
+        var det='';
+        if(op.email) det+='📧 '+op.email+' ';
+        if(op.phone) det+='📞 '+op.phone;
+        var sel=(r.chosenOpt===oi)?' selected':'';
+        optsHtml+='<button class="opt-btn'+sel+'" onclick="chooseOpt('+r.id+','+oi+')">'+
+          '<div class="opt-name">'+esc(op.name||r.name)+'</div>'+
+          (op.description?'<div class="opt-desc">'+esc(op.description)+'</div>':'')+
+          (det?'<div class="opt-detail">'+esc(det.trim())+'</div>':'')+
+        '</button>';
+      }
+      optsHtml+='</div>';
+    }
+    var ph=esc(r.phone), em=esc(r.email), co=esc(r.company), id=r.id;
+    var fieldsHtml='<div class="acf">'+
+      '<div class="acfi"><div class="acfl">📞 Phone</div><div class="acfv"><input value="'+ph+'" placeholder="Add phone..." data-id="'+id+'" data-f="phone" onchange="updS(+this.dataset.id,this.dataset.f,this.value)"></div></div>'+
+      '<div class="acfi"><div class="acfl">📧 Email</div><div class="acfv"><input value="'+em+'" placeholder="Add email..." data-id="'+id+'" data-f="email" onchange="updS(+this.dataset.id,this.dataset.f,this.value)"></div></div>'+
+      (r.company?'<div class="acfi" style="grid-column:1/-1"><div class="acfl">🏢 Company</div><div class="acfv"><input value="'+co+'" placeholder="Company" data-id="'+id+'" data-f="company" onchange="updS(+this.dataset.id,this.dataset.f,this.value)"></div></div>':'')+
+    '</div>';
+    return '<div class="ac '+r.cc+(r.approved?' approved':'')+(r.options&&r.options.length>1?' ac-multi':'')+'" id="sc_'+r.id+'">'+
+      '<div class="ac-top">'+
+        '<div class="ac-ph">'+(r.cc==='green'?'🟢':r.cc==='yellow'?'🟡':'🔴')+'</div>'+
+        '<div class="ac-meta">'+
+          '<div class="ac-name">'+esc(r.name||'Unknown')+'</div>'+
+          '<div class="ac-src">'+srcLabel+'</div>'+
+          '<span class="cbadge '+r.cc+'">'+r.confidence+'% confidence</span>'+
+        '</div>'+
+      '</div>'+
+      optsHtml+fieldsHtml+
+      (r.reason?'<div class="ac-rsn">💡 '+esc(r.reason)+'</div>':'')+
+      '<div class="search-links" id="sl_'+r.id+'"></div>'+
+      '<div class="ac-acts">'+
+        '<button class="btn-app'+(r.approved?' done':'')+'" onclick="appCard('+r.id+')">'+(r.approved?'✅ Approved':'✅ Approve')+'</button>'+
+        '<button class="btn-skp" onclick="skipCard('+r.id+')">🚫 Skip</button>'+
+        '<button class="btn-find" data-rid="'+r.id+'" data-name="'+esc(r.name)+'" onclick="cardSearch(this)">🔎 Find</button>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+  document.getElementById('cardList').innerHTML=html||'<div style="text-align:center;padding:40px;color:#bbb">All done!</div>';
+  var appC=scanRes.filter(function(r){return r.approved;}).length;
+  document.getElementById('scanExp').classList.toggle('hidden',appC===0);
+}
+
+function updS(id,f,v){var r=scanRes.find(function(r){return r.id===id;});if(r)r[f]=v;}
+
+function chooseOpt(id,oi){
+  var r=scanRes.find(function(r){return r.id===id;});
+  if(!r||!r.options||!r.options[oi]) return;
+  var op=r.options[oi];
+  r.chosenOpt=oi;
+  // Fill fields from chosen option
+  if(op.name) r.name=op.name;
+  if(op.email) r.email=op.email;
+  if(op.phone) r.phone=op.phone;
+  if(op.company) r.company=op.company;
+  // Boost confidence since user confirmed
+  r.confidence=85; r.cc='green'; r.reason='You selected this match';
+  renderCards();
+  toast('✅ Selected: '+(op.name||r.name));
+}
+function appCard(id){
+  var r=scanRes.find(function(r){return r.id===id;});if(!r)return;
+  r.approved=true;r.skipped=false;
+  var ex=contacts.find(function(c){return (c.phone&&c.phone===r.phone)||(c.email&&c.email===r.email)||(c.name.toLowerCase()===r.name.toLowerCase());});
+  if(!ex&&(r.name||r.phone||r.email)){contacts.push({id:++idc,name:r.name,phone:r.phone,email:r.email,company:r.company});updateCounts();document.getElementById('tblSec').classList.remove('hidden');renderTbl();}
+  renderCards(); toast('✅ '+r.name+' approved!');
+}
+function skipCard(id){var r=scanRes.find(function(r){return r.id===id;});if(r){r.skipped=true;r.approved=false;}renderCards();}
+function appAll(){
+  scanRes.filter(function(r){return r.cc==='green'&&!r.skipped;}).forEach(function(r){
+    r.approved=true;
+    var ex=contacts.find(function(c){return(c.phone&&c.phone===r.phone)||(c.email&&c.email===r.email);});
+    if(!ex&&(r.name||r.phone||r.email))contacts.push({id:++idc,name:r.name,phone:r.phone,email:r.email,company:r.company});
+  });
+  autoDd();updateCounts();document.getElementById('tblSec').classList.remove('hidden');renderTbl();renderCards();
+  toast('✅ All green contacts approved!');
+}
+function skipAll(){scanRes.filter(function(r){return r.cc==='red';}).forEach(function(r){r.skipped=true;});renderCards();toast('Skipped all red');}
+function expApp(fmt){
+  var app=scanRes.filter(function(r){return r.approved;});
+  if(!app.length){toast('No approved contacts');return;}
+  var ts=new Date().toISOString().replace(/[:T]/g,'-').split('.')[0];
+  dlBlob(fmt==='csv'?mkCSV(app):mkXLSX(app),'GameOn-SmartScan-'+ts+'.'+(fmt==='csv'?'csv':'xlsx'));
+  toast('✅ Exported '+app.length+' approved contacts!');
+}
+function setSP(d,t,m){var p=t?Math.round(d/t*100):0;document.getElementById('scanPfl').style.width=p+'%';document.getElementById('scanPtx').textContent=m;}
+function slog(m,c){var b=document.getElementById('scanLog');b.innerHTML+='<div class="'+c+'">'+m+'</div>';b.scrollTop=b.scrollHeight;}
+
+// MERGE
+function addMergeFiles(files){
+  var arr=Array.from(files);if(!arr.length)return;
+  arr.forEach(function(f){mFiles.push({id:++idc,file:f,ext:f.name.split('.').pop().toLowerCase(),status:'pending'});});
+  renderMF(); document.getElementById('mergeArow').classList.remove('hidden');
+  toast(arr.length+' file'+(arr.length>1?'s':'')+' added!');
+}
+function renderMF(){
+  var ic={xlsx:'📊',xls:'📊',csv:'📄',vcf:'📇',txt:'📝',docx:'📃'};
+  document.getElementById('mfList').innerHTML=mFiles.map(function(it){
+    var st=it.status==='done'?'✓ Loaded':it.status==='error'?'✗ Error':it.status==='working'?'⏳...':'Pending';
+    var sc=it.status==='done'?'#16a34a':it.status==='error'?'#dc2626':it.status==='working'?'#e8122d':'#bbb';
+    return '<div class="fi '+it.status+'" id="mf_'+it.id+'">'+
+      '<div class="fi-i">'+(ic[it.ext]||'📎')+'</div>'+
+      '<div class="fi-inf"><div class="fi-n">'+esc(it.file.name)+'</div><div class="fi-m">'+fsz(it.file.size)+' · '+it.ext.toUpperCase()+'</div></div>'+
+      '<div class="fi-s" style="color:'+sc+'">'+st+'</div>'+
+      '<button class="delbtn" onclick="rmMF('+it.id+')">🗑</button>'+
+    '</div>';
+  }).join('');
+}
+function rmMF(id){mFiles=mFiles.filter(function(f){return f.id!==id;});renderMF();if(!mFiles.length)document.getElementById('mergeArow').classList.add('hidden');}
+
+async function runMerge(){
+  if(!mFiles.length)return;
+  var key=getKey();
+  document.getElementById('mergeBtn').disabled=true;
+  document.getElementById('mergePbar').classList.remove('hidden');
+  mContacts=[];mConflicts=[];
+  var all=[];
+  for(var i=0;i<mFiles.length;i++){
+    var mf=mFiles[i];
+    setMP(i,mFiles.length,'Loading '+mf.file.name+'...');
+    mf.status='working';renderMF();
+    try{
+      var loaded=[];
+      if(['xlsx','xls','csv'].indexOf(mf.ext)>=0)loaded=await procXLS(mf.file,key);
+      else if(mf.ext==='vcf')loaded=await procVCF(mf.file);
+      else loaded=await procTXT(mf.file,key);
+      all=all.concat(loaded);mf.status='done';
+    }catch(e){mf.status='error';}
+    renderMF();
+  }
+  setMP(mFiles.length,mFiles.length,'Merging '+all.length+' contacts...');
+  var result=smartMerge(all);
+  mContacts=result.merged;mConflicts=result.conflicts;
+  var sd=document.getElementById('mergeStDiv');
+  sd.classList.remove('hidden');
+  sd.innerHTML='<div class="mstats">📥 <b>'+all.length+'</b> total contacts loaded<br>🔁 <b>'+result.removed+'</b> duplicates merged<br>✅ <b>'+mContacts.length+'</b> unique contacts'+(mConflicts.length?'<br>⚠️ <b>'+mConflicts.length+'</b> name conflicts need your decision':'')+'</div>';
+  document.getElementById('mergeBtn').disabled=false;
+  if(mConflicts.length)showMConflicts();
+  else dlMerged();
+}
+
+function smartMerge(all){
+  var merged=[],conflicts=[],used=new Set();
+  for(var i=0;i<all.length;i++){
+    if(used.has(i))continue;
+    var base=JSON.parse(JSON.stringify(all[i]));
+    for(var j=i+1;j<all.length;j++){
+      if(used.has(j))continue;
+      if(isMatch(base,all[j])){
+        var cf=mergeTwo(base,all[j]);
+        if(cf)conflicts.push(cf);
+        used.add(j);
+      }
+    }
+    used.add(i);merged.push(base);
+  }
+  return{merged:merged,conflicts:conflicts,removed:all.length-merged.length};
+}
+function isMatch(a,b){
+  var pa=(a.phone||'').replace(/\s/g,'').toLowerCase(),pb=(b.phone||'').replace(/\s/g,'').toLowerCase();
+  var ea=(a.email||'').toLowerCase().trim(),eb=(b.email||'').toLowerCase().trim();
+  var na=(a.name||'').toLowerCase().trim(),nb=(b.name||'').toLowerCase().trim();
+  if(pa&&pb&&pa===pb)return true;if(ea&&eb&&ea===eb)return true;if(na&&nb&&na.length>2&&na===nb)return true;return false;
+}
+function mergeTwo(base,other){
+  if(!base.phone&&other.phone)base.phone=other.phone;
+  if(!base.email&&other.email)base.email=other.email;
+  if(!base.company&&other.company)base.company=other.company;
+  var na=(base.name||'').trim(),nb=(other.name||'').trim();
+  if(na&&nb&&na.toLowerCase()!==nb.toLowerCase()){var cid=Date.now()+Math.random();base._cid=cid;return{cid:cid,nameA:na,nameB:nb,phone:base.phone||'',email:base.email||''};}
+  return null;
+}
+
+function showMConflicts(){
+  var sec=document.getElementById('mergeConf');sec.classList.remove('hidden');
+  sec.innerHTML='<div class="card"><div class="slbl">⚠️ Name Conflicts — Choose</div>'+
+    '<div style="font-size:13px;color:#888;margin-bottom:12px">Same person found with different names — choose which to keep:</div>'+
+    mConflicts.map(function(c,i){
+      return '<div class="confli"><div style="font-size:12px;color:#888;margin-bottom:6px">📞 '+(c.phone||'-')+' | 📧 '+(c.email||'-')+'</div>'+
+        '<div class="cfbts">'+
+          '<button class="cfb chosen" id="ca'+i+'" onclick="chC('+i+',\''+c.nameA.replace(/'/g,"\\'")+'\')">' +c.nameA+'</button>'+
+          '<button class="cfb" id="cb'+i+'" onclick="chC('+i+',\''+c.nameB.replace(/'/g,"\\'")+'\')">' +c.nameB+'</button>'+
+        '</div></div>';
+    }).join('')+
+    '<button class="btnx" style="margin-top:12px;width:100%" onclick="applyMerge()">✅ Apply &amp; Download</button>'+
+  '</div>';
+}
+function chC(i,name){
+  mConflicts[i].chosen=name;
+  document.getElementById('ca'+i).className='cfb'+(name===mConflicts[i].nameA?' chosen':'');
+  document.getElementById('cb'+i).className='cfb'+(name===mConflicts[i].nameB?' chosen':'');
+}
+function applyMerge(){
+  mConflicts.forEach(function(c){if(c.chosen){var ct=mContacts.find(function(m){return m._cid===c.cid;});if(ct)ct.name=c.chosen;}});
+  dlMerged();
+}
+function dlMerged(){
+  if(!mContacts.length){toast('No contacts');return;}
+  var ts=new Date().toISOString().replace(/[:T]/g,'-').split('.')[0];
+  dlBlob(mkXLSX(mContacts.map(function(c){return{id:0,name:c.name||'',company:c.company||'',phone:c.phone||'',email:c.email||''};})),'GameOn-Merged-'+ts+'.xlsx');
+  contacts=contacts.concat(mContacts.map(function(c){return{id:++idc,name:c.name||'',phone:c.phone||'',email:c.email||'',company:c.company||''};}));
+  autoDd();updateCounts();document.getElementById('tblSec').classList.remove('hidden');renderTbl();
+  toast('✅ Downloaded '+mContacts.length+' merged contacts!');
+}
+function setMP(d,t,m){var p=t?Math.round(d/t*100):0;document.getElementById('mergePfl').style.width=p+'%';document.getElementById('mergePtx').textContent=m;}
+
+// HISTORY
+function saveSess(info){
+  var h=JSON.parse(localStorage.getItem('gog_h')||'[]');
+  h.unshift({id:Date.now(),date:new Date().toISOString(),type:info.type||'unknown',fc:info.fc||0,cc:info.cc||0,fa:info.fa||0});
+  if(h.length>100)h=h.slice(0,100);
+  localStorage.setItem('gog_h',JSON.stringify(h));updateSessCount();
+}
+function updateSessCount(){var h=JSON.parse(localStorage.getItem('gog_h')||'[]');document.getElementById('sS').textContent=h.length;}
+function renderHist(){
+  var h=JSON.parse(localStorage.getItem('gog_h')||'[]'),list=document.getElementById('histList');
+  if(!h.length){list.innerHTML='<div class="nohist">📭 No sessions yet</div>';return;}
+  list.innerHTML=h.map(function(s){
+    var d=new Date(s.date),ic={screenshots:'📸',files:'📁',video:'🎬'};
+    return '<div class="hist-item"><div class="h-hdr">'+
+      '<div class="h-date">'+(ic[s.type]||'📋')+' '+d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})+' at '+d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})+'</div>'+
+      '<span class="h-badge">'+s.cc+' contacts</span></div>'+
+      '<div style="font-size:12px;color:#888"><b>'+s.fc+'</b> files'+(s.fa?' · <b>'+s.fa+'</b> frames':'')+'</div></div>';
+  }).join('');
+}
+function clearHist(){if(!confirm('Clear all history?'))return;localStorage.removeItem('gog_h');renderHist();updateSessCount();toast('History cleared');}
+
+// UTILS
+function sleep(ms){return new Promise(function(r){setTimeout(r,ms);});}
+function toB64(file){return new Promise(function(res,rej){var r=new FileReader();r.onload=function(){res(r.result.split(',')[1]);};r.onerror=rej;r.readAsDataURL(file);});}
+function fsz(b){return b>1048576?(b/1048576).toFixed(1)+' MB':b>1024?(b/1024).toFixed(0)+' KB':b+' B';}
+function mlog(m,c){var b=document.getElementById('mainLog');b.classList.remove('hidden');b.innerHTML+='<div class="'+c+'">'+m+'</div>';b.scrollTop=b.scrollHeight;}
+function setAP(d,t,m){var p=t?Math.round(d/t*100):0;document.getElementById('aiPfl').style.width=p+'%';document.getElementById('aiPtx').textContent=m;}
+function updateCounts(){
+  document.getElementById('sF').textContent=imgs.length+docs.length+(curVid?1:0);
+  document.getElementById('sC').textContent=contacts.length;
+  document.getElementById('sD').textC
+  document.getElementById('sD').textContent=imgs.filter(function(i){return i.status==='done';}).length+docs.filter(function(i){return i.status==='done';}).length;
+  updateSessCount();
+}
+
+// ── PLATFORM SEARCH ───────────────────────────────────────
+// Hebrew to English transliteration map
+var HE_MAP={'א':'a','ב':'b','ג':'g','ד':'d','ה':'h','ו':'v','ז':'z','ח':'ch','ט':'t','י':'y','כ':'k','ך':'k','ל':'l','מ':'m','ם':'m','נ':'n','ן':'n','ס':'s','ע':'','פ':'p','ף':'f','צ':'tz','ץ':'tz','ק':'k','ר':'r','ש':'sh','ת':'t',' ':' '};
+
+function hasHebrew(str){return /[֐-׿]/.test(str);}
+
+function transliterateHebrew(str){
+  return str.split('').map(function(c){return HE_MAP[c]!==undefined?HE_MAP[c]:c;}).join('').replace(/\s+/g,' ').trim();
+}
+
+async function getEnglishName(name, key){
+  if(!hasHebrew(name)) return null;
+  try{
+    var r=await callT(key,'Transliterate this Hebrew name to English letters only. Return ONLY the transliterated name, nothing else: '+name);
+    return r.split('\n')[0].trim();
+  }catch(e){
+    return transliterateHebrew(name);
+  }
+}
+
+function buildSearchLinks(name, engName){
+  var q=encodeURIComponent(name);
+  var qe=engName?encodeURIComponent(engName):q;
+  var qBoth=engName?encodeURIComponent(name+' '+engName):q;
+
+  var links=[
+    {label:'🔵 LinkedIn', cls:'slink-li', url:'https://www.linkedin.com/search/results/people/?keywords='+qe},
+    {label:'🔵 Facebook', cls:'slink-fb', url:'https://www.facebook.com/search/people/?q='+q},
+    {label:'✖ Twitter', cls:'slink-tw', url:'https://twitter.com/search?q='+qe+'&f=user'},
+    {label:'🔴 Google', cls:'slink-go', url:'https://www.google.com/search?q='+qBoth+'+email+contact'},
+    {label:'🟠 Crunchbase', cls:'slink-cb', url:'https://www.crunchbase.com/search/people/field/persons/facet_ids/'+qe},
+    {label:'🌐 All Web', cls:'slink-all', url:'https://www.google.com/search?q='+qBoth+'+site:linkedin.com+OR+site:facebook.com+OR+site:twitter.com+email'}
+  ];
+  if(engName){
+    links.push({label:'🔵 LinkedIn (EN)', cls:'slink-li', url:'https://www.linkedin.com/search/results/people/?keywords='+qe});
+  }
+  return links.map(function(l){
+    return '<a class="slink '+l.cls+'" href="'+l.url+'" target="_blank" rel="noopener">'+l.label+'</a>';
+  }).join('');
+}
+
+async function doSearch(){
+  var name=document.getElementById('searchNameIn').value.trim();
+  if(!name) return;
+  var key=getKey();
+  var res=document.getElementById('searchResults');
+  res.innerHTML='<div style="text-align:center;padding:20px;color:#bbb">🔍 Searching...</div>';
+
+  var engName=null;
+  if(hasHebrew(name)){
+    res.innerHTML='<div style="text-align:center;padding:20px;color:#bbb">🔄 Translating Hebrew name...</div>';
+    if(key) engName=await getEnglishName(name,key);
+    else engName=transliterateHebrew(name);
+  }
+
+  var links=buildSearchLinks(name,engName);
+  var html='<div class="card" style="margin-bottom:0">';
+  html+='<div style="font-size:16px;font-weight:900;margin-bottom:6px">'+esc(name)+(engName?' <span style="color:#aaa;font-size:13px;font-weight:600">('+esc(engName)+')</span>':'')+'</div>';
+  html+='<div style="font-size:12px;color:#888;margin-bottom:10px">Click any platform to search — opens in new tab</div>';
+  html+='<div class="search-links">'+links+'</div>';
+  html+='</div>';
+  res.innerHTML=html;
+
+  // Save to search history
+  var hist=JSON.parse(localStorage.getItem('gog_sh')||'[]');
+  if(!hist.find(function(h){return h.name===name;})){
+    hist.unshift({name:name,engName:engName,time:Date.now()});
+    if(hist.length>20) hist=hist.slice(0,20);
+    localStorage.setItem('gog_sh',JSON.stringify(hist));
+  }
+}
+
+function renderQuickSearch(){
+  if(!contacts.length) return;
+  var sec=document.getElementById('quickSearchSec');
+  sec.classList.remove('hidden');
+  var list=document.getElementById('quickSearchList');
+  list.innerHTML=contacts.slice(0,20).map(function(c){
+    if(!c.name) return '';
+    var isHe=hasHebrew(c.name);
+    return '<div class="sr-item">'+
+      '<div>'+
+        '<div class="sr-name">'+esc(c.name)+'</div>'+
+        (c.company?'<div style="font-size:11px;color:#888">'+esc(c.company)+'</div>':'')+
+        (isHe?'<div style="font-size:11px;color:#e8122d">Hebrew — searches both languages</div>':'')+
+      '</div>'+
+      '<button class="btn-r" data-cname="'+esc(c.name)+'" onclick="quickSearch(this)" style="padding:6px 12px;font-size:12px;white-space:nowrap">🔎 Search</button>'+
+    '</div>';
+  }).join('');
+}
+
+function quickSearch(btn){
+  var name=btn.dataset.cname;
+  document.getElementById('searchNameIn').value=name;
+  doSearch();
+}
+
+
+async function searchContact(name){
+  document.getElementById('searchNameIn').value=name;
+  goTab('search');
+  await doSearch();
+}
+
+// Add search links to Smart Scan approval cards
+async function addSearchLinksToCard(rid, name, key){
+  var engName=null;
+  if(hasHebrew(name)&&key) engName=await getEnglishName(name,key);
+  else if(hasHebrew(name)) engName=transliterateHebrew(name);
+  var links=buildSearchLinks(name,engName);
+  var card=document.getElementById('sc_'+rid);
+  if(!card) return;
+  var existing=card.querySelector('.search-links');
+  if(existing) existing.remove();
+  var div=document.createElement('div');
+  div.className='search-links';
+  div.innerHTML=links;
+  var rsn=card.querySelector('.ac-rsn');
+  var acts=card.querySelector('.ac-acts');
+  card.insertBefore(div,rsn||acts);
+}
+
+var tt;
+function toast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.remove('hidden');clearTimeout(tt);tt=setTimeout(function(){t.classList.add('hidden');},3200);}
+</script>
+</body>
+</html>
